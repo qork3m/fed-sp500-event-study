@@ -4,6 +4,7 @@ import os
 import sqlite3
 import numpy as np
 from scipy.stats import ttest_ind
+import matplotlib.pyplot as plt
 
 
 # We are pulling S&P 500 Data from Yfinance API
@@ -96,6 +97,24 @@ for date in fomc_from_db["FOMC_dates"]:
 pre_vol_avg = np.mean(pre_vol)
 post_vol_avg = np.mean(post_vol)
 t_test = ttest_ind(pre_vol, post_vol, equal_var=False)
-print(f"Pre Average Volatility: {pre_vol_avg} ")
+print(f"Pre Average Volatility: {pre_vol_avg}")
 print(f"Post Average Volatility: {post_vol_avg}")
 print(f"Welch T-test P-value: {t_test.pvalue}")
+
+# Graphic
+folder_name = os.path.dirname(os.path.abspath(__file__))
+# Bar Graphic
+plt.figure()
+plt.bar(["Pre-Meeting", "Post-Meeting"], [pre_vol_avg, post_vol_avg])
+plt.title("Average S&P 500 Volatility: Pre vs Post FOMC Meetings")
+plt.ylabel("Volatility (Std. Dev. of Daily Returns)")
+plt.savefig(os.path.join(folder_name, "bar_chart.png"))
+
+# Box Plot
+plt.figure()
+plt.boxplot([pre_vol, post_vol], tick_labels=["Pre-Meeting", "Post-Meeting"])
+plt.title("Distribution of S&P 500 Volatility: Pre vs Post FOMC Meetings")
+plt.ylabel("Volatility (Std. Dev. of Daily Returns)")
+plt.savefig(os.path.join(folder_name, "box_plot.png"))
+
+plt.show()
